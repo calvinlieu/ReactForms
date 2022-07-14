@@ -71,6 +71,7 @@ const Form = () => {
           </ul>
         </div>
       )}
+      {/* {phone.length ? setDropDownVisible(false) : setDropDownVisible(true)} */}
       <form onSubmit={onSubmit}>
         <div>
           <label htmlFor="name">Name:</label>
@@ -96,7 +97,8 @@ const Form = () => {
             id="phone"
             name="phone"
             type="text"
-            onChange={(e) => setPhone(e.target.value)}
+            // onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => { setPhone(e.target.value); setDropDownVisible(false) }}
             value={phone}
           />
           <select
@@ -105,7 +107,6 @@ const Form = () => {
             value={phoneType}
             disabled={dropDownVisible}
           >
-            {/* {phone.length ? setDropDownVisible(false) : setDropDownVisible(true)} */}
             {console.log(phone)}
             <option value="" disabled>
               Select a phone type...
