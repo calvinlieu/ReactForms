@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import validator from 'validator'
 
 const Form = () => {
   const [name, setName] = useState("");
@@ -8,9 +9,31 @@ const Form = () => {
   const [bio, setBio] = useState("");
   const [staff, setStaff] = useState("");
   const [notification, setNotification] = useState(false);
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [dropDownVisible, setDropDownVisible] = useState(true)
+
+
+
+  useEffect(() => {
+    const errors = [];
+    if (!name.length) errors.push("Please enter your name");
+    if (!email.length) errors.push("Please provide a valid email");
+    if (!phone.length || !validator.isMobilePhone(phone)) errors.push("Please provide a valid phone");
+    if (bio.length > 280) errors.push("Bio length exceeded");
+
+    setValidationErrors(errors);
+  }, [name, email, phone, bio]);
 
   const onSubmit = (e) => {
     e.preventDefault();
+
+    setHasSubmitted(true);
+    if (validationErrors.length) return alert("Cannot submit");
+
+    // if(phone.length)
+    console.log(phone)
+
     const formObj = {
       name,
       email,
@@ -23,7 +46,7 @@ const Form = () => {
     };
 
     console.log(formObj);
-    
+
     setName("");
     setEmail("");
     setPhone("");
@@ -31,11 +54,23 @@ const Form = () => {
     setStaff("");
     setBio("");
     setNotification(false);
+    setValidationErrors([])
+    setHasSubmitted(false);
   };
 
   return (
     <div>
-      <h2>Contact Us</h2>
+      <h2>User Registration Form</h2>
+      {hasSubmitted && validationErrors.length > 0 && (
+        <div>
+          The following errors were found:
+          <ul>
+            {validationErrors.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <form onSubmit={onSubmit}>
         <div>
           <label htmlFor="name">Name:</label>
@@ -68,7 +103,10 @@ const Form = () => {
             name="phoneType"
             onChange={(e) => setPhoneType(e.target.value)}
             value={phoneType}
+            disabled={dropDownVisible}
           >
+            {/* {phone.length ? setDropDownVisible(false) : setDropDownVisible(true)} */}
+            {console.log(phone)}
             <option value="" disabled>
               Select a phone type...
             </option>
@@ -106,7 +144,6 @@ const Form = () => {
             value={staff}
           />
         </div>
-
         <div>
           <label htmlFor="bio">Bio:</label>
           <textarea
