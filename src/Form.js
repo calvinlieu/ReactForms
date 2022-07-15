@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import './index.css'
 // import validator from 'validator'
 
 const Form = () => {
@@ -12,23 +13,37 @@ const Form = () => {
   const [validationErrors, setValidationErrors] = useState([]);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [dropDownVisible, setDropDownVisible] = useState(true)
+  const [nameValidation, setNameValidation] = useState(false)
+  const [emailValidation, setEmailValidation] = useState(false)
+
 
   useEffect(() => {
     const errors = [];
-    if (!name.length) errors.push("Please enter your name");
-    if (!email.length) errors.push("Please provide a valid email");
+
+    if (!name.length) {
+      errors.push("Please enter your name");
+      setNameValidation(false)
+    } else setNameValidation(true)
+
+    if (!email.length || !email.includes('@')) {
+      errors.push("Please provide a valid email");
+      setEmailValidation(false)
+    } else setEmailValidation(true)
+
     // if (phone.length && !validator.isMobilePhone(phone)) errors.push("Please provide a valid phone");
-    const checkPhone = () => {
-      const phoneArr = phone.split("-")
-      for (let i = 0; i < 10; i++) {
-        if (![1, 2, 3, 4, 5, 6, 7, 8, 9, 0].includes(phoneArr[i])) return false;
+    if (phone.length) {
+      if (phone.length !== 12) errors.push("Please provide a valid phone");
+      else {
+        const phoneParts = phone.split("-")
+        const phoneNum = phoneParts.join('').split('')
+        for (let i = 0; i < 10; i++) {
+          if (![1, 2, 3, 4, 5, 6, 7, 8, 9, 0].includes(Number(phoneNum[i]))) errors.push("Please provide a valid phone");
+          else setDropDownVisible(false)
+        }
       }
     }
 
-    if (phone.length < 12 || phone.length > 12 || !checkPhone) errors.push("Please provide a valid phone");
-
     if (bio.length > 280) errors.push("Bio length exceeded");
-
     setValidationErrors(errors);
   }, [name, email, phone, bio]);
 
@@ -37,9 +52,6 @@ const Form = () => {
 
     setHasSubmitted(true);
     if (validationErrors.length) return alert("Cannot submit");
-
-    // if(phone.length)
-    console.log(phone)
 
     const formObj = {
       name,
@@ -58,6 +70,7 @@ const Form = () => {
     setEmail("");
     setPhone("");
     setPhoneType("");
+    setDropDownVisible(false);
     setStaff("");
     setBio("");
     setNotification(false);
@@ -68,12 +81,13 @@ const Form = () => {
   return (
     <div>
       <h2>User Registration Form</h2>
-      {hasSubmitted && validationErrors.length > 0 && (
+      {/* errors are shown dynamically as user fills out the form */}
+      {validationErrors.length > 0 && (
         <div>
-          The following errors were found:
+          Fields highlighted in blue are required:
           <ul>
-            {validationErrors.map((error) => (
-              <li key={error}>{error}</li>
+            {validationErrors.find((error) => (
+              {error}
             ))}
           </ul>
         </div>
@@ -85,15 +99,17 @@ const Form = () => {
           <input
             id="name"
             type="text"
+            className={nameValidation ? null : 'highlight'}
             onChange={(e) => setName(e.target.value)}
             value={name}
-          />
+            />
         </div>
         <div>
           <label htmlFor="email">Email:</label>
           <input
             id="email"
             type="email"
+            className={emailValidation ? null : 'highlight'}
             onChange={(e) => setEmail(e.target.value)}
             value={email}
           />
@@ -106,7 +122,7 @@ const Form = () => {
             type="text"
             placeholder="###-###-####"
             // onChange={(e) => setPhone(e.target.value)}
-            onChange={(e) => { setPhone(e.target.value); setDropDownVisible(false) }}
+            onChange={(e) => { setPhone(e.target.value) }}
             value={phone}
           />
           <select

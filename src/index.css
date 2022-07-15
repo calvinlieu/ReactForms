@@ -1,1 +1,8 @@
 /* TODO Add site wide styles */
+.highlight {
+    box-shadow: 0 0 5px rgb(42, 199, 202);
+}
+
+input {
+    margin: 5px;
+}
