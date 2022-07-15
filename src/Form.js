@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import validator from 'validator'
+// import validator from 'validator'
 
 const Form = () => {
   const [name, setName] = useState("");
@@ -13,13 +13,20 @@ const Form = () => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [dropDownVisible, setDropDownVisible] = useState(true)
 
-
-
   useEffect(() => {
     const errors = [];
     if (!name.length) errors.push("Please enter your name");
     if (!email.length) errors.push("Please provide a valid email");
-    if (!phone.length || !validator.isMobilePhone(phone)) errors.push("Please provide a valid phone");
+    // if (phone.length && !validator.isMobilePhone(phone)) errors.push("Please provide a valid phone");
+    const checkPhone = () => {
+      const phoneArr = phone.split("-")
+      for (let i = 0; i < 10; i++) {
+        if (![1, 2, 3, 4, 5, 6, 7, 8, 9, 0].includes(phoneArr[i])) return false;
+      }
+    }
+
+    if (phone.length < 12 || phone.length > 12 || !checkPhone) errors.push("Please provide a valid phone");
+
     if (bio.length > 280) errors.push("Bio length exceeded");
 
     setValidationErrors(errors);
@@ -97,6 +104,7 @@ const Form = () => {
             id="phone"
             name="phone"
             type="text"
+            placeholder="###-###-####"
             // onChange={(e) => setPhone(e.target.value)}
             onChange={(e) => { setPhone(e.target.value); setDropDownVisible(false) }}
             value={phone}
